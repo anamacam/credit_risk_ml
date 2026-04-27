@@ -11,7 +11,7 @@ imblearn==0.0
 numba==0.58.1
 
 # --- MLOps & Tracking (Sincronizado con tu meta.yaml) ---
-mlflow==2.10.2
+mlflow==3.11.0rc1
 pyyaml==6.0.1
 pydantic==2.5.3
 pydantic-settings==2.1.0
