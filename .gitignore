@@ -5,20 +5,24 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# Distribución / build
+# =========================
+# Build
+# =========================
 build/
 dist/
 *.egg-info/
 .eggs/
 
+# =========================
 # Entornos virtuales
+# =========================
 .venv/
 venv/
 env/
 ENV/
 
 # =========================
-# IDEs / Editores
+# IDEs
 # =========================
 .vscode/
 .idea/
@@ -39,44 +43,36 @@ ENV/
 htmlcov/
 
 # =========================
-# Type checkers / linters
+# Linters
 # =========================
 .mypy_cache/
 .ruff_cache/
 .pyre/
 
 # =========================
-# ML / Data Science
+# Data / ML
 # =========================
-
-# datasets (ignorar locales, pero permitir estructura si fuera necesario)
-data/raw/*.csv
-data/processed/*.csv
+data/raw/
+data/processed/
 datasets/
 *.parquet
 *.feather
 
-# modelos entrenados legacy
 artifacts/
 *.pkl
 *.joblib
 *.model
 
-# sklearn cache
-.cache/
-
 # =========================
-# MLflow (Profesional)
+# MLflow / Experimentos
 # =========================
-
-# Ignorar la base de datos de experimentos (SQLite)
-experiments/*.db
-
-# Ignorar las carpetas de artefactos generadas por MLflow (suelen ser números: 0, 1, 2...)
-experiments/[0-9]*/
-
-# Ignorar mlruns si por error se genera
 mlruns/
+experiments/
+
+# =========================
+# Monitoring
+# =========================
+prometheus_data/
 
 # =========================
 # Logs / OS / Secrets
@@ -88,7 +84,4 @@ Thumbs.db
 .env
 .env.*
 secrets.yml
-mlflow.db
 *.db
-prometheus_data/
-*.log
