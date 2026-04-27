@@ -1,0 +1,28 @@
+{
+    "roc_auc": 0.6845238095238096,
+    "best_threshold": 0.42,
+    "dataset_size": 1000,
+    "features": [
+        "Age",
+        "Job",
+        "Credit amount",
+        "Duration",
+        "credit_per_month",
+        "age_duration_ratio",
+        "Sex_male",
+        "Housing_own",
+        "Housing_rent",
+        "Saving accounts_moderate",
+        "Saving accounts_quite rich",
+        "Saving accounts_rich",
+        "Checking account_moderate",
+        "Checking account_rich",
+        "Purpose_car",
+        "Purpose_domestic appliances",
+        "Purpose_education",
+        "Purpose_furniture/equipment",
+        "Purpose_radio/TV",
+        "Purpose_repairs",
+        "Purpose_vacation/others"
+    ]
+}

@@ -1,0 +1,97 @@
+{
+    "Duration": {
+        "magnitude": 0.0707111715560072,
+        "direction": "Positive",
+        "correlation": 0.8134
+    },
+    "Credit amount": {
+        "magnitude": 0.04096842150236525,
+        "direction": "Positive",
+        "correlation": 0.6411
+    },
+    "Housing_own": {
+        "magnitude": 0.032093255113775254,
+        "direction": "Negative",
+        "correlation": -0.9672
+    },
+    "Age": {
+        "magnitude": 0.028623225408614263,
+        "direction": "Negative",
+        "correlation": -0.5848
+    },
+    "Purpose_radio/TV": {
+        "magnitude": 0.02857858215052249,
+        "direction": "Negative",
+        "correlation": -0.9679
+    },
+    "Checking account_moderate": {
+        "magnitude": 0.025595956053807573,
+        "direction": "Positive",
+        "correlation": 0.9279
+    },
+    "Sex_male": {
+        "magnitude": 0.016382792642298073,
+        "direction": "Negative",
+        "correlation": -0.9158
+    },
+    "Housing_rent": {
+        "magnitude": 0.010886469070658308,
+        "direction": "Positive",
+        "correlation": 0.9436
+    },
+    "Saving accounts_rich": {
+        "magnitude": 0.008465177776298608,
+        "direction": "Negative",
+        "correlation": -0.982
+    },
+    "Purpose_education": {
+        "magnitude": 0.007867508730395078,
+        "direction": "Positive",
+        "correlation": 0.9479
+    },
+    "Job": {
+        "magnitude": 0.007163851914101337,
+        "direction": "Negative",
+        "correlation": -0.5827
+    },
+    "Purpose_car": {
+        "magnitude": 0.006489015079650439,
+        "direction": "Negative",
+        "correlation": -0.1362
+    },
+    "Purpose_furniture/equipment": {
+        "magnitude": 0.005313246917241344,
+        "direction": "Positive",
+        "correlation": 0.7468
+    },
+    "Saving accounts_quite rich": {
+        "magnitude": 0.005291852490261035,
+        "direction": "Negative",
+        "correlation": -0.9781
+    },
+    "Saving accounts_moderate": {
+        "magnitude": 0.0022712997370056736,
+        "direction": "Negative",
+        "correlation": -0.1928
+    },
+    "Checking account_rich": {
+        "magnitude": 0.0012967467715844815,
+        "direction": "Positive",
+        "correlation": 0.4527
+    },
+    "Purpose_repairs": {
+        "magnitude": 0.0003491713666349543,
+        "direction": "Positive",
+        "correlation": 0.9317
+    },
+    "Purpose_domestic appliances": {
+        "magnitude": 7.893394584916216e-05,
+        "direction": "Positive",
+        "correlation": 0.5865
+    },
+    "Purpose_vacation/others": {
+        "magnitude": 0.0,
+        "direction": "Negative",
+        "correlation": NaN
+    }
+}

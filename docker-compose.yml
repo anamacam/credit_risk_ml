@@ -1,0 +1,191 @@
+services:
+  mlflow_server:
+    image: ghcr.io/mlflow/mlflow:latest
+    container_name: mlflow_service
+    ports:
+      - "5000:5000"
+    environment:
+      - MLFLOW_HTTP_REQUEST_TIMEOUT=120
+    volumes:
+      - ./mlruns:/app/mlruns
+      - ./mlflow.db:/app/mlflow.db
+      - C:\projects\credit_risk_ml\experiments\exp_20260322_155648_v3_optimized:/app/artifacts
+    command: >
+      mlflow server 
+      --host 0.0.0.0 
+      --port 5000 
+      --backend-store-uri sqlite:////app/mlflow.db 
+      --default-artifact-root /app/artifacts
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
+      interval: 20s
+      timeout: 15s
+      retries: 10
+      start_period: 60s
+    restart: unless-stopped
+
+  training_service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: training_pipeline
+    depends_on:
+      mlflow_server:
+        condition: service_healthy
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow_service:5000
+      - MLFLOW_ARTIFACT_ROOT=/app/artifacts
+      - PYTHONPATH=/app/src
+    volumes:
+      - ./src:/app/src
+      - ./data:/app/data
+      - C:\projects\credit_risk_ml\experiments\exp_20260322_155648_v3_optimized:/app/artifacts
+      - ./mlruns:/app/mlruns
+    command: python -m credit_risk_analysis.training.train_pipeline
+    restart: "no"
+
+  api_service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: risk_api
+    ports:
+      - "8000:8000"
+    depends_on:
+      mlflow_server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 20s
+      timeout: 15s
+      retries: 5
+      start_period: 0s
+    environment:
+      - GIT_PYTHON_REFRESH=quiet
+      - MLFLOW_TRACKING_URI=http://mlflow_service:5000
+      - API_HOST=0.0.0.0
+      - PYTHONPATH=/app/src
+      - DEFAULT_THRESHOLD=0.35
+      - PROJECT_ROOT=/app
+      - MLFLOW_MODEL_RUN_ID=exp_20260322_155648_v3_optimized
+      - MODEL_PATH=experiments/exp_20260322_155648_v3_optimized/model.pkl
+      - PREPROCESSOR_PATH=experiments/exp_20260322_155648_v3_optimized/preprocessor.pkl
+    volumes:
+      - ./src:/app/src:ro
+      - ./data:/app/data
+      - ./mlruns:/app/mlruns
+      - ./artifacts:/app/artifacts
+      - ./experiments:/app/experiments  # IMPORTANTE: montar experiments
+    command: python -m uvicorn credit_risk_analysis.api.main:app --host 0.0.0.0 --port 8000
+    restart: unless-stopped
+
+  dashboard_pred:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: risk_dashboard_pred
+    ports:
+      - "8501:8501"
+    depends_on:
+      api_service:
+        condition: service_healthy
+    environment:
+      - GIT_PYTHON_REFRESH=quiet
+      - PYTHONPATH=/app/src
+      - API_URL=http://risk_api:8000
+      - PROJECT_ROOT=/app 
+      - DEFAULT_THRESHOLD=0.387
+      - MODEL_PATH=experiments/exp_20260322_155648_v3_optimized/model.pkl
+      - PREPROCESSOR_PATH=experiments/exp_20260322_155648_v3_optimized/preprocessor.pkl
+    volumes:
+      - ./src:/app/src:ro
+      - ./data:/app/data:ro
+      - ./artifacts:/app/artifacts:ro
+      - ./experiments:/app/experiments:ro  # IMPORTANTE: montar experiments
+    command: streamlit run src/credit_risk_analysis/dashboard/app.py --server.port 8501 --server.address 0.0.0.0
+    restart: unless-stopped
+
+  dashboard_monitor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: risk_dashboard_monitor
+    ports:
+      - "8502:8502"
+    depends_on:
+      api_service:
+        condition: service_healthy
+    environment:
+      - GIT_PYTHON_REFRESH=quiet
+      - MLFLOW_TRACKING_URI=http://mlflow_service:5000
+      - PYTHONPATH=/app/src
+      - API_URL=http://risk_api:8000/predict
+      - PROJECT_ROOT=/app 
+      - DEFAULT_THRESHOLD=0.387
+    volumes:
+      - ./src:/app/src:ro
+      - ./data:/app/data:ro
+      - ./logs:/app/logs
+      - ./artifacts:/app/artifacts:ro
+      - ./mlruns:/app/mlruns:ro
+      - ./experiments:/app/experiments:ro  # IMPORTANTE: montar experiments
+    command: streamlit run src/credit_risk_analysis/dashboard/monitor.py --server.port 8502 --server.address 0.0.0.0
+    restart: unless-stopped
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    container_name: cadvisor_service
+    privileged: true
+    ports:
+      - "8081:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    devices:
+      - /dev/kmsg
+    restart: unless-stopped
+
+  pushgateway:
+    image: prom/pushgateway:latest
+    container_name: pushgateway_service
+    ports:
+      - "9091:9091"
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus_service
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./src/credit_risk_analysis/config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    depends_on:
+      - api_service
+      - cadvisor
+      - pushgateway
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana_service
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+volumes:
+  prometheus_data:
+  grafana_data:
+

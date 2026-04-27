@@ -1,0 +1,78 @@
+# [cite: 2026-03-09] Fuente de verdad única para API y Dashboard
+project_metadata:
+  name: "credit_risk_ml"
+  version: "1.0.0"
+  description: "Modelo de clasificación de riesgo crediticio con explicabilidad SHAP"
+
+# --- Configuración de Infraestructura (Base) ---
+infrastructure:
+  log_level: "INFO"
+  mlflow_tracking_uri: "http://localhost:5000"
+  model_path: "artifacts/model/model.pkl"
+  shap_path: "artifacts/shap_explanation.pkl"
+  api_timeout: 10.0
+
+# --- Definición de Features (Estructura de Datos) ---
+features:
+  - name: "Age"
+    label: "Edad del Cliente"
+    type: "slider"
+    min: 18
+    max: 100
+    default: 30
+
+  - name: "Sex"
+    label: "Género"
+    type: "selectbox"
+    options: ["male", "female"]
+    default: "male"
+
+  - name: "Job"
+    label: "Nivel de Trabajo"
+    type: "selectbox"
+    options: [0, 1, 2, 3]
+    default: 2
+
+  - name: "Housing"
+    label: "Tipo de Vivienda"
+    type: "selectbox"
+    options: ["own", "rent", "free"]
+    default: "own"
+
+  - name: "Saving accounts"
+    label: "Estado Cuenta de Ahorros"
+    type: "selectbox"
+    options: ["little", "moderate", "quite rich", "rich"]
+    default: "little"
+
+  - name: "Checking account"
+    label: "Estado Cuenta Corriente"
+    type: "selectbox"
+    options: ["little", "moderate", "rich"]
+    default: "little"
+
+  - name: "Credit amount"
+    label: "Monto del Crédito"
+    type: "number"
+    min: 250
+    max: 20000
+    default: 5000
+
+  - name: "Duration"
+    label: "Duración del Crédito (meses)"
+    type: "slider"
+    min: 4
+    max: 72
+    default: 24
+
+  - name: "Purpose"
+    label: "Propósito del Crédito"
+    type: "selectbox"
+    options: ["radio/TV", "education", "furniture/equipment", "car", "business", "domestic appliances", "repairs", "vacation/others"]
+    default: "car"
+
+# --- Configuración de Negocio ---
+business_rules:
+  target_name: "Risk"
+  target_labels: {0: "Good Risk", 1: "Bad Risk"}
+  risk_threshold: 0.70  # Umbral para alerta roja en UI

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Stress & Bias Testing Report — Credit Risk</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<style>
+  body { font-family: Arial, sans-serif; background: #0f1117;
+         color: #e0e0e0; margin: 0; padding: 24px; }
+  h1 { color: #4fc3f7; border-bottom: 2px solid #4fc3f7;
+       padding-bottom: 8px; }
+  h2 { color: #81d4fa; margin-top: 40px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr;
+           gap: 24px; margin-top: 16px; }
+  .card { background: #1e2130; border-radius: 12px;
+           padding: 20px; }
+  .card h3 { margin-top: 0; color: #b3e5fc; }
+  .metric { display: inline-block; background: #263045;
+             border-radius: 8px; padding: 10px 18px;
+             margin: 6px; text-align: center; }
+  .metric .val { font-size: 1.6em; font-weight: bold;
+                  color: #4fc3f7; }
+  .metric .lbl { font-size: 0.8em; color: #90caf9; }
+  .ok { color: #69f0ae; }
+  .warn { color: #ff8a65; }
+  table { width: 100%; border-collapse: collapse;
+           margin-top: 12px; }
+  th { background: #263045; padding: 8px; text-align: left; }
+  td { padding: 8px; border-bottom: 1px solid #263045; }
+  .badge-ok { background: #1b5e20; color: #69f0ae;
+               padding: 2px 8px; border-radius: 4px; }
+  .badge-warn { background: #bf360c; color: #ff8a65;
+                 padding: 2px 8px; border-radius: 4px; }
+</style>
+</head>
+<body>
+<h1>🧪 Stress & Bias Testing Report — Credit Risk Model</h1>
+<p style="color:#90caf9">
+  Generado: 2026-03-19 19:40:20 |
+  API: http://localhost:8000
+</p>
+
+<h2>1. Stress Testing — Latencia</h2>
+<div class="grid">
+  <div class="card">
+    <h3>Percentiles de Latencia por Test</h3>
+    <canvas id="latencyChart"></canvas>
+  </div>
+  <div class="card">
+    <h3>Tasa de Exito por Test</h3>
+    <canvas id="successChart"></canvas>
+  </div>
+</div>
+
+<h2>2. Bias Testing — Subgrupos</h2>
+<div class="grid">
+  <div class="card">
+    <h3>Tasa de Rechazo por Sexo</h3>
+    <canvas id="sexChart"></canvas>
+  </div>
+  <div class="card">
+    <h3>Tasa de Rechazo por Tipo de Trabajo</h3>
+    <canvas id="jobChart"></canvas>
+  </div>
+</div>
+
+<h2>3. Contrafactuales</h2>
+<div class="card">
+  <h3>Delta de Probabilidad al Cambiar Variable Sensible</h3>
+  <canvas id="cfChart" style="max-height:220px"></canvas>
+</div>
+
+<table style="margin-top:16px">
+  <tr>
+    <th>Test</th><th>Variable</th>
+    <th>Prob A</th><th>Prob B</th>
+    <th>Delta</th><th>Decision cambio</th><th>Sesgo</th>
+  </tr>
+  <tr><td>Hombre vs Mujer — mismo perfil</td><td>sex</td><td>0.3701</td><td>0.4864</td><td>+0.1163</td><td>No</td><td><span class=badge-ok>OK</span></td></tr><tr><td>Trabajo calificado vs no calificado</td><td>job</td><td>0.386</td><td>0.4002</td><td>+0.0142</td><td>No</td><td><span class=badge-ok>OK</span></td></tr><tr><td>Vivienda propia vs alquiler</td><td>housing</td><td>0.3701</td><td>0.5099</td><td>+0.1398</td><td>No</td><td><span class=badge-ok>OK</span></td></tr><tr><td>Ahorros altos vs bajos</td><td>saving_accounts</td><td>0.2999</td><td>0.4498</td><td>+0.1499</td><td>Si</td><td><span class=badge-warn>SESGO</span></td></tr>
+
+</table>
+
+<h2>4. Fairness — Disparate Impact Ratio</h2>
+<div class="grid">
+  <div class="card">
+    <h3>DIR por Grupo (umbral 0.80)</h3>
+    <canvas id="dirChart"></canvas>
+  </div>
+  <div class="card">
+    <h3>Resumen Fairness</h3>
+    <table>
+      <tr><th>Grupo</th><th>DIR</th>
+          <th>Gap</th><th>80% Rule</th></tr>
+      <tr><td>sex</td><td>1.0000</td><td>0.0000</td><span class=badge-ok>CUMPLE</span></td></tr><tr><td>job</td><td>1.0000</td><td>0.0000</td><span class=badge-ok>CUMPLE</span></td></tr><tr><td>housing</td><td>1.0000</td><td>0.0000</td><span class=badge-ok>CUMPLE</span></td></tr>
+    </table>
+  </div>
+</div>
+
+<script>
+const latencyCtx = document.getElementById('latencyChart');
+new Chart(latencyCtx, {
+  type: 'bar',
+  data: {
+    labels: ["volume_stress", "corruption_stress", "drift_simulation", "dos_simulation"],
+    datasets: [
+      { label: 'P50', data: [399.0, 11.3, 25.1, 792.4],
+         backgroundColor: '#4fc3f7' },
+      { label: 'P95', data: [429.0, 45.7, 47.2, 808.3],
+         backgroundColor: '#ff8a65' },
+      { label: 'P99', data: [432.0, 45.7, 49.2, 809.8],
+         backgroundColor: '#ef5350' },
+    ]
+  },
+  options: {
+    plugins: { legend: { labels: { color: '#e0e0e0' } } },
+    scales: {
+      x: { ticks: { color: '#90caf9' } },
+      y: { ticks: { color: '#90caf9' },
+            title: { display: true, text: 'ms',
+                       color: '#90caf9' } }
+    }
+  }
+});
+
+const successCtx = document.getElementById('successChart');
+new Chart(successCtx, {
+  type: 'bar',
+  data: {
+    labels: ["volume_stress", "corruption_stress", "drift_simulation", "dos_simulation"],
+    datasets: [{
+      label: 'Tasa de exito (%)',
+      data: [100.0, 100.0, 100.0, 100.0],
+      backgroundColor: '#69f0ae'
+    }]
+  },
+  options: {
+    plugins: { legend: { labels: { color: '#e0e0e0' } } },
+    scales: {
+      x: { ticks: { color: '#90caf9' } },
+      y: { min: 0, max: 100,
+            ticks: { color: '#90caf9' } }
+    }
+  }
+});
+
+const sexCtx = document.getElementById('sexChart');
+new Chart(sexCtx, {
+  type: 'bar',
+  data: {
+    labels: ["male", "female"],
+    datasets: [
+      { label: 'Tasa rechazo (%)', data: [100.0, 100.0],
+         backgroundColor: ['#4fc3f7','#ff80ab'] },
+    ]
+  },
+  options: {
+    plugins: { legend: { labels: { color: '#e0e0e0' } } },
+    scales: {
+      x: { ticks: { color: '#90caf9' } },
+      y: { ticks: { color: '#90caf9' } }
+    }
+  }
+});
+
+const jobCtx = document.getElementById('jobChart');
+new Chart(jobCtx, {
+  type: 'bar',
+  data: {
+    labels: ["Job 0", "Job 1", "Job 2", "Job 3"],
+    datasets: [{
+      label: 'Tasa rechazo (%)',
+      data: [100.0, 100.0, 100.0, 100.0],
+      backgroundColor: ['#ef5350','#ff8a65','#ffb74d','#69f0ae']
+    }]
+  },
+  options: {
+    plugins: { legend: { labels: { color: '#e0e0e0' } } },
+    scales: {
+      x: { ticks: { color: '#90caf9' } },
+      y: { ticks: { color: '#90caf9' } }
+    }
+  }
+});
+
+const cfCtx = document.getElementById('cfChart');
+new Chart(cfCtx, {
+  type: 'bar',
+  data: {
+    labels: ["sex", "job", "housing", "saving_accounts"],
+    datasets: [{
+      label: 'Delta probabilidad (%)',
+      data: [11.63, 1.42, 13.98, 14.99],
+      backgroundColor: [11.63, 1.42, 13.98, 14.99].map(v =>
+        Math.abs(v) > 10 ? '#ef5350' : '#69f0ae'
+      )
+    }]
+  },
+  options: {
+    plugins: { legend: { labels: { color: '#e0e0e0' } } },
+    scales: {
+      x: { ticks: { color: '#90caf9' } },
+      y: { ticks: { color: '#90caf9' },
+            title: { display: true, text: 'Delta (%)',
+                       color: '#90caf9' } }
+    }
+  }
+});
+
+const dirCtx = document.getElementById('dirChart');
+new Chart(dirCtx, {
+  type: 'bar',
+  data: {
+    labels: ["sex", "job", "housing"],
+    datasets: [{
+      label: 'DIR (min 0.80)',
+      data: [1.0, 1.0, 1.0],
+      backgroundColor: [1.0, 1.0, 1.0].map(v =>
+        v >= 0.80 ? '#69f0ae' : '#ef5350'
+      )
+    }]
+  },
+  options: {
+    plugins: {
+      legend: { labels: { color: '#e0e0e0' } },
+      annotation: {}
+    },
+    scales: {
+      x: { ticks: { color: '#90caf9' } },
+      y: { min: 0, max: 1.2,
+            ticks: { color: '#90caf9' } }
+    }
+  }
+});
+</script>
+</body>
+</html>

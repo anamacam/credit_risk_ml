@@ -1,0 +1,39 @@
+name: CreditRiskAnalysis
+
+# Referencia al entorno para reproducibilidad total
+conda_env: conda.yaml
+
+entry_points:
+  main:
+    parameters:
+      data_path:
+        type: string
+        default: "data/raw/german_credit_data.csv"
+      n_estimators:
+        type: int
+        default: 200
+      max_depth:
+        type: int
+        default: 12
+      min_samples_leaf:
+        type: int
+        default: 5
+    command: >
+      python src/credit_risk_analysis/training/train_experiment.py
+      --data_path {data_path}
+      --n_estimators {n_estimators}
+      --max_depth {max_depth}
+      --min_samples_leaf {min_samples_leaf}
+
+  dashboard:
+    parameters:
+      server_port:
+        type: int
+        default: 8501
+    command: >
+      streamlit run src/credit_risk_analysis/dashboard/app.py 
+      --server.port {server_port}
+      --server.address 0.0.0.0
+
+
+

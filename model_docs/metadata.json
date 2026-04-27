@@ -1,0 +1,14 @@
+{
+    "version": "1.0.0",
+    "run_id": "",
+    "data": {
+        "algorithm": null,
+        "hyperparameters": {},
+        "metrics": {},
+        "features": [],
+        "preprocessing": [],
+        "imports": [],
+        "dataset_info": {},
+        "threshold": 0.5
+    }
+}

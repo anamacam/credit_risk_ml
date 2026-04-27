@@ -1,0 +1,16 @@
+creation_timestamp: 1772205249891
+current_stage: None
+deployment_job_state: null
+description: null
+last_updated_timestamp: 1772205249891
+model_id: m-fc70921de13940159605ed23f1db9199
+name: CreditRiskLogistic
+run_id: 0db04d3516bc468293da137acc0fa452
+run_link: null
+source: models:/m-fc70921de13940159605ed23f1db9199
+status: READY
+status_message: null
+storage_location: file:///C:/projects/credit_risk_ml/experiments/941538189194071550/models/m-fc70921de13940159605ed23f1db9199/artifacts
+user_id: null
+version: 1
+workspace: default

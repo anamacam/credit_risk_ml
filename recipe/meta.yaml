@@ -1,0 +1,63 @@
+package:
+  name: credit_risk_analysis
+  version: "1.0.0"
+
+source:
+  path: ..
+  include:
+    - src/
+    - pyproject.toml
+    - README.md
+
+build:
+  number: 0
+  noarch: python
+  # Instalación limpia siguiendo estándares de empaquetado profesional
+  script: "{{ PYTHON }} -m pip install . --no-deps --ignore-installed -vv"
+  entry_points:
+    - credit-risk-train = credit_risk_analysis.training.training:main
+
+requirements:
+  host:
+    - python=3.12
+    - pip
+    - setuptools >=61.0
+    - wheel
+  run:
+    - python=3.12
+    - pandas >=2.0.0
+    - scikit-learn >=1.3.0
+    - mlflow-skinny >=2.20.0  # Versión ligera para entornos de producción
+    - sqlalchemy >=2.0.0
+    - sqlite
+    - cloudpickle >=3.0.0
+    - numpy >=1.24.0,<2.0.0
+    - shap >=0.44.0
+    - matplotlib-base >=3.8.0
+    - pydantic >=2.0.0
+    - joblib >=1.3.0           # Crítico para caché de pipelines (S6969)
+
+test:
+  # Estas pruebas validan que los módulos tengan sus tipos correctos [cite: 2026-03-04]
+  imports:
+    - credit_risk_analysis
+    - credit_risk_analysis.training.training
+    - credit_risk_analysis.modeling.pipeline
+    - credit_risk_analysis.modeling.model_factory
+    - credit_risk_analysis.governance.registry
+  commands:
+    - credit-risk-train --help
+
+about:
+  home: https://github.com/tu-usuario/credit_risk_ml
+  license: MIT
+  license_family: MIT
+  summary: "Enterprise MLOps: Credit Risk with MLflow, SHAP XAI and Python 3.12"
+  description: |
+    Pipeline integral de riesgo crediticio que implementa linters estrictos 
+    (Mypy, Flake8) y gobernanza de modelos mediante MLflow y explicabilidad 
+    con SHAP. Diseñado para automatización total de ciclo de vida.
+
+extra:
+  recipe-maintainers:
+    - tu-usuario

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>SHAP Feature Impact</title>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <style>
+        body { 
+            font-family: 'Source Sans Pro', sans-serif; 
+            background-color: transparent; 
+            margin: 0; padding: 0;
+            overflow: hidden; 
+        }
+        /* Ajuste de robustez para evitar cortes en el iframe de Streamlit */
+        #chart { 
+            width: 100%; 
+            height: 98vh; 
+            margin: 0 auto; 
+        }
+        .error-container {
+            color: #B00020; padding: 20px; text-align: center;
+            border: 2px dashed #B00020; border-radius: 8px;
+            margin: 20px; background-color: #FDE7E9; font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div id="chart"></div>
+    <script>
+        /**
+         * Inicialización dinámica cumpliendo S2486 (SonarLint).
+         * SHAP_DATA es el marcador de posición para la inyección desde Python.
+         */
+        function getShapData() {
+            try {
+                // Inyección Directa: Se espera un objeto JSON válido
+                const rawData = SHAP_DATA; 
+                
+                if (!rawData || typeof rawData !== 'object') {
+                    throw new TypeError("Estructura de datos SHAP no válida o vacía.");
+                }
+                
+                return rawData;
+
+            } catch (error_) {
+                // Manejo de excepción explícito para evitar "swallowing"
+                const chartDiv = document.querySelector("#chart");
+                const isRefError = error_ instanceof ReferenceError;
+                const msg = isRefError ? "SHAP_DATA no inyectado" : error_.message;
+
+                if (chartDiv) {
+                    chartDiv.innerHTML = `
+                        <div class="error-container">
+                            <strong>🚨 Error de Visualización</strong><br>
+                            <small>${msg}</small>
+                        </div>
+                    `;
+                }
+                console.error("[SHAP_UI_ERROR]:", error_);
+                return null;
+            }
+        }
+
+        const data = getShapData();
+
+        if (data) {
+            // Detección dinámica del tema (Claro/Oscuro)
+            const isDark = data.theme === 'dark';
+            const textColor = isDark ? '#FFFFFF' : '#31333F';
+            const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+
+            // Preparación de datos (Ordenados por importancia absoluta)
+            const combined = data.features.map((f, i) => ({
+                name: f,
+                value: data.values[i] || 0
+            })).sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
+
+            const options = {
+                series: [{
+                    name: 'Impacto SHAP',
+                    data: combined.map(c => Number.parseFloat(c.value.toFixed(4)))
+                }],
+                chart: { 
+                    type: 'bar', 
+                    height: '100%', 
+                    toolbar: { show: false },
+                    foreColor: textColor,
+                    background: 'transparent',
+                    animations: { enabled: true, easing: 'easeinout', speed: 800 }
+                },
+                plotOptions: {
+                    bar: {
+                        horizontal: true,
+                        borderRadius: 4,
+                        colors: {
+                            ranges: [
+                                { from: -100, to: -0.00001, color: '#00E396' }, // Reduce riesgo (Verde)
+                                { from: 0, to: 100, color: '#FF4560' }          // Aumenta riesgo (Rojo)
+                            ]
+                        }
+                    }
+                },
+                xaxis: {
+                    categories: combined.map(c => c.name),
+                    labels: { style: { colors: textColor } }
+                },
+                yaxis: {
+                    labels: { 
+                        style: { colors: textColor, fontSize: '12px' }, 
+                        maxWidth: 180 
+                    }
+                },
+                grid: { borderColor: gridColor, strokeDashArray: 4 },
+                tooltip: { 
+                    theme: isDark ? 'dark' : 'light',
+                    x: { show: true }
+                },
+                dataLabels: { enabled: false }
+            };
+
+            const chart = new ApexCharts(document.querySelector("#chart"), options);
+            chart.render();
+        }
+    </script>
+</body>
+</html>

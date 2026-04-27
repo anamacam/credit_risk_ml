@@ -1,0 +1,21 @@
+{
+    "Age": 0.17430203635789115,
+    "Job": 0.04289990552160607,
+    "Credit amount": 0.2603506966365769,
+    "Duration": 0.2166656546311684,
+    "Sex_male": 0.036000028359120535,
+    "Housing_own": 0.04394958297573209,
+    "Housing_rent": 0.021285563639105363,
+    "Saving accounts_moderate": 0.015501278205943854,
+    "Saving accounts_quite rich": 0.0106985874030205,
+    "Saving accounts_rich": 0.02393407803873835,
+    "Checking account_moderate": 0.04358958290733329,
+    "Checking account_rich": 0.007791123681272874,
+    "Purpose_car": 0.028359750331649922,
+    "Purpose_domestic appliances": 0.00044685404237999226,
+    "Purpose_education": 0.014785285833601461,
+    "Purpose_furniture/equipment": 0.0187572728593947,
+    "Purpose_radio/TV": 0.03965668422154528,
+    "Purpose_repairs": 0.0010260343539193345,
+    "Purpose_vacation/others": 0.0
+}

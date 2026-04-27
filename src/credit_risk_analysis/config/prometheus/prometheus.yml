@@ -1,0 +1,30 @@
+global:
+  scrape_interval: 5s 
+  evaluation_interval: 5s
+
+# Reglas de alerta pueden ir aquí en el futuro
+rule_files:
+  # - "alert_rules.yml"
+
+scrape_configs:
+  # 1. Monitoreo de la API de Riesgo (Métricas de negocio, modelo y threshold 0.35)
+  - job_name: 'credit_risk_api'
+    metrics_path: '/metrics' 
+    static_configs:
+      - targets: ['risk_api:8000']
+
+  # 2. Monitoreo de Infraestructura (Uso de CPU/RAM de contenedores)
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor_service:8080']
+
+  # 3. Pushgateway (Métricas de Stress, Bias y Drifts de ejecución única)
+  - job_name: 'pushgateway'
+    honor_labels: true  # Importante: mantiene las etiquetas que envíes desde el script de Python
+    static_configs:
+      - targets: ['pushgateway_service:9091']
+
+  # 4. Automonitoreo de Prometheus
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']

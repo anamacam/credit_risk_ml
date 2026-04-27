@@ -1,0 +1,90 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribución / build
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Entornos virtuales
+.venv/
+venv/
+env/
+ENV/
+
+# =========================
+# IDEs / Editores
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# =========================
+# Jupyter
+# =========================
+.ipynb_checkpoints/
+
+# =========================
+# Testing / coverage
+# =========================
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# =========================
+# Type checkers / linters
+# =========================
+.mypy_cache/
+.ruff_cache/
+.pyre/
+
+# =========================
+# ML / Data Science
+# =========================
+
+# datasets (ignorar locales, pero permitir estructura si fuera necesario)
+data/raw/*.csv
+data/processed/*.csv
+datasets/
+*.parquet
+*.feather
+
+# modelos entrenados legacy
+artifacts/
+*.pkl
+*.joblib
+*.model
+
+# sklearn cache
+.cache/
+
+# =========================
+# MLflow (Profesional)
+# =========================
+
+# Ignorar la base de datos de experimentos (SQLite)
+experiments/*.db
+
+# Ignorar las carpetas de artefactos generadas por MLflow (suelen ser números: 0, 1, 2...)
+experiments/[0-9]*/
+
+# Ignorar mlruns si por error se genera
+mlruns/
+
+# =========================
+# Logs / OS / Secrets
+# =========================
+logs/
+*.log
+.DS_Store
+Thumbs.db
+.env
+.env.*
+secrets.yml
