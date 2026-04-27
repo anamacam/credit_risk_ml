@@ -88,3 +88,7 @@ Thumbs.db
 .env
 .env.*
 secrets.yml
+mlflow.db
+*.db
+prometheus_data/
+*.log
