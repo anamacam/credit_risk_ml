@@ -37,7 +37,7 @@ shap==0.44.0
 streamlit==1.31.0
 plotly==5.18.0
 cachetools==5.3.2
-requests==2.31.0
+requests==2.33.0
 
 # --- Calidad de Código & Tipado (DevOps) ---
 # Estas versiones aseguran que tu Mypy y Flake8 no den falsos positivos
